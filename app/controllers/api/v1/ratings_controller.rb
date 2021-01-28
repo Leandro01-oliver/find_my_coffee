@@ -1,9 +1,12 @@
 class Api::V1::RatingsController < ApplicationController
    
     def create 
-        create_store
-        create_rating
-       
+        ActiveRecord::Base.transaction do
+            create_store
+            create_rating 
+
+            render json: @rating
+        end
     end
 
     private
@@ -17,7 +20,7 @@ class Api::V1::RatingsController < ApplicationController
 
     def create_store
         @store = Store.find_or_create_by!(
-            lonlat: "POINT(#{params[:store][:longitude]}.to_f #{params[:store][:latitude]}.to_f)",
+            lonlat: "POINT(#{params[:store][:longitude].to_f} #{params[:store][:latitude].to_f})",
             name: params[:store][:name],
             address: params[:store][:address],
             google_place_id: params[:store][:google_place_id], 
